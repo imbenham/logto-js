@@ -2,7 +2,6 @@
   "name": "root",
   "private": true,
   "scripts": {
-    "preinstall": "npx only-allow pnpm",
     "version": "pnpm i --frozen-lockfile=false && git add pnpm-lock.yaml",
     "bootstrap": "lerna bootstrap",
     "build": "lerna run --stream build",
