@@ -1,5 +1,5 @@
 import { IdTokenClaims, UserInfoResponse } from '@logto/browser';
-import { useCallback, useContext, useEffect, useRef } from 'react';
+import { useCallback, useContext, useEffect, useMemo, useRef } from 'react';
 
 import { LogtoContext, throwContextError } from '../context';
 
@@ -57,7 +57,6 @@ const useHandleSignInCallback = (callback?: () => void) => {
   const callbackRef = useRef<() => void>();
 
   useEffect(() => {
-    // eslint-disable-next-line @silverhand/fp/no-mutation
     callbackRef.current = callback; // Update ref to the latest callback.
   }, [callback]);
 
@@ -69,6 +68,13 @@ const useHandleSignInCallback = (callback?: () => void) => {
 
       try {
         setLoadingState(true);
+        const currentPageUrl = window.location.href;
+        const isSignInRedirected = await logtoClient.isSignInRedirected(currentPageUrl);
+
+        if (!isSignInRedirected) {
+          console.log('we are not at the right redirect url');
+          throw new Error('unknown');
+        }
         await logtoClient.handleSignInCallback(callbackUri);
         setIsAuthenticated(true);
         callbackRef.current?.();
@@ -84,8 +90,13 @@ const useHandleSignInCallback = (callback?: () => void) => {
   useEffect(() => {
     const currentPageUrl = window.location.href;
 
-    if (!isAuthenticated && logtoClient?.isSignInRedirected(currentPageUrl)) {
+    if (!isAuthenticated ) {
+      console.log('invoking sign in callback');
       void handleSignInCallback(currentPageUrl);
+    } else {
+      console.log('did not invoke sign in callback.');
+      console.log('isAuthenticated: ', isAuthenticated);
+      console.log('is redirected: ', logtoClient?.isSignInRedirected(currentPageUrl), currentPageUrl);
     }
   }, [handleSignInCallback, isAuthenticated, logtoClient]);
 
@@ -119,6 +130,7 @@ const useLogto = (): Logto => {
     },
     [logtoClient, setLoadingState, handleError]
   );
+
 
   const signOut = useCallback(
     async (postLogoutRedirectUri?: string) => {
@@ -207,3 +219,4 @@ const useLogto = (): Logto => {
 };
 
 export { useLogto, useHandleSignInCallback };
+
