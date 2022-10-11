@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "clean": "rimraf dist",
-    "build": "npm run clean && tsc && webpack --mode production"
+    "build": "npm run clean && npm install --save file:packages/react && npm install --save file:packages/browser && npm install --save file:packages/client && tsc && webpack --mode production"
   },
   "devDependencies": {
     "typescript": "4.7.4"
@@ -16,7 +16,6 @@
   "dependencies": {
     "@logto/browser": "^1.0.0-beta.8",
     "@logto/client": "^1.0.0-beta.8",
-    "@logto/react": "^1.0.0-beta.8",
-    "@logto/js": "^1.0.0-beta.8"
+    "@logto/react": "^1.0.0-beta.8"
   }
 }
